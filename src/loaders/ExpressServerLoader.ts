@@ -12,6 +12,8 @@ export function ExpressServerLoader(): Application {
     controllers: Object.values(Controllers),
   });
 
+  // expressApp.use(express.json());
+
   expressApp.listen(process.env.PORT);
 
   return expressApp;

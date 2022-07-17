@@ -2,11 +2,12 @@ import { ExpressMiddlewareInterface } from "routing-controllers";
 import axios, { AxiosResponse } from "axios";
 import { Request } from "express";
 
+// @Middleware({type: "before"})
 export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
 
   async use(request: Request<CarListInput>, response: any, next?: (err?: any) => any): Promise<void> {
     try {
-      const { body: { vin } } = request;
+      const { query: { vin } } = request;
 
       if (!vin || typeof vin !== "string") return next({
         log: `Error in ${this.use}: User did not provide VIN number or VIN format is incorrect.`,
@@ -30,9 +31,9 @@ export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
 
       const { Results } = data;
 
-      const { Make, ModelYear, Model, } = Results[0];
+      const { Make, ModelYear, Model } = Results[0];
 
-      request.body = { ...request.body, make: Make, modelYear: ModelYear, model: Model};
+      request.query = { vin, make: Make, modelYear: ModelYear, model: Model };
 
       next();
     } catch (error) {
@@ -61,7 +62,7 @@ interface CarListInput {
 
 interface DecodedVINData extends CarListInput {
   Model: string;
-  ModelYear: number;
+  ModelYear: string;
   Make: string;
 }
 

@@ -15,9 +15,9 @@ export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
         message: { error: "Error: Incorrect VIN provided. Please provide a valid VIN number" },
       });
 
-      const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/${vin}?format=json`;
+      const URL = process.env.VIN_DECODE_URL + `${vin}?format=json`;
 
-      const decodedVINData: AxiosResponse<IDecodedVINData, unknown> = await axios.get(url);
+      const decodedVINData: AxiosResponse<IDecodedVINData, unknown> = await axios.get(URL);
 
       const { data, status, statusText } = decodedVINData;
 
@@ -48,10 +48,10 @@ interface IDecodedVINData {
   Results: DecodedVINData[]
 }
 
-interface CarListInput {
+interface CarListInput extends DecodedVINData {
   licensePlateNumber: number;
   registrationNumber: number;
-  registrationState: States;
+  registrationState: string;
   registrationExpiration: Date;
   registrationName: string;
   vin: string;
@@ -60,12 +60,8 @@ interface CarListInput {
   vehicleDescription: string;
 }
 
-interface DecodedVINData extends CarListInput {
+interface DecodedVINData {
   Model: string;
   ModelYear: string;
   Make: string;
-}
-
-enum States {
-  CA="CA"
 }

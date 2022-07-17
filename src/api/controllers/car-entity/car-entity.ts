@@ -3,19 +3,15 @@ import { VINDecoderMiddleware } from "../../middlewares";
 
 @JsonController("/car")
 export class CarController {
-  @Get()
+  @Get("/listings")
   get(): string {
-    return "Returns all cars";
+    return "Returns all car listings";
   }
 
   @Post("/create-listing")
   @UseBefore(VINDecoderMiddleware)
   async create(@Body() body: any, @QueryParams() query: any): Promise<string> {
-    console.log("this is the query", query);
-    // decode VIN and get year, make, model
-    console.log("this is the body", body);
-    console.log("hello in post");
-    return "Posted to database.";
+    return "Posted new listing to database.";
   }
 
   @Put("/update-listing")
@@ -27,6 +23,6 @@ export class CarController {
   @Delete("/delete-listing")
   @UseBefore(VINDecoderMiddleware)
   async delete(@Body() body: any, @QueryParams() query: any): Promise<string> {
-    return "Deleted from database.";
+    return "Deleted listing from database.";
   }
 }

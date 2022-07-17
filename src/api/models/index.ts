@@ -1,1 +1,1 @@
-export { ExampleEntity } from "./example-entity/example-entity";
+export { CarListing } from "./car-entity/car-entity";

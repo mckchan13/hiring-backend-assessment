@@ -54,10 +54,10 @@ interface CarListInput extends DecodedVINData {
   registrationState: string;
   registrationExpiration: Date;
   registrationName: string;
-  vin: string;
   carValue: number;
   currentMileage: number;
   vehicleDescription: string;
+  vin: string;
 }
 
 interface DecodedVINData {

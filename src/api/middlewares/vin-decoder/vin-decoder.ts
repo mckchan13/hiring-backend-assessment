@@ -1,11 +1,12 @@
 import { ExpressMiddlewareInterface } from "routing-controllers";
 import axios, { AxiosResponse } from "axios";
 import { Request } from "express";
+import { Listing } from "../../models";
 
-// @Middleware({type: "before"})
+
 export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
 
-  async use(request: Request<CarListInput>, response: any, next?: (err?: any) => any): Promise<void> {
+  async use(request: Request<Record<string, Listing>>, response: unknown, next?: (err?: unknown) => void | never): Promise<void> {
     try {
       const { query: { vin } } = request;
 
@@ -17,7 +18,7 @@ export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
 
       const URL = process.env.VIN_DECODE_URL + `${vin}?format=json`;
 
-      const decodedVINData: AxiosResponse<IDecodedVINData, unknown> = await axios.get(URL);
+      const decodedVINData: AxiosResponse = await axios.get(URL);
 
       const { data, status, statusText } = decodedVINData;
 
@@ -44,24 +45,9 @@ export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
   }
 }
 
-interface IDecodedVINData {
-  Results: DecodedVINData[]
-}
-
-interface CarListInput extends DecodedVINData {
-  licensePlateNumber: number;
-  registrationNumber: number;
-  registrationState: string;
-  registrationExpiration: Date;
-  registrationName: string;
-  carValue: number;
-  currentMileage: number;
-  vehicleDescription: string;
+export interface DecodedVINData {
   vin: string;
-}
-
-interface DecodedVINData {
-  Model: string;
-  ModelYear: string;
-  Make: string;
+  model: string;
+  year: string;
+  make: string;
 }

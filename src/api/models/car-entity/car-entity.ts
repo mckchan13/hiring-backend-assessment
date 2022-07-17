@@ -1,22 +1,34 @@
 import {
-  BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn,
-  UpdateDateColumn
+  BaseEntity,
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
 } from "typeorm";
 
-  @Entity("Car")
-export class CarListing extends BaseEntity {
+import { Listing } from "../listing-entity/listing-entity";
+import { Date } from "../date-entity/date-entity";
+
+@Entity("Car")
+export class Car extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
     id: string;
 
   @Column()
-    exampleColumn: string;
+    vin: string;
 
-  @CreateDateColumn()
-    createdDate: Date;
+  @Column()
+    year: number;
 
-  @UpdateDateColumn()
-    updatedDate: Date;
+  @Column()
+    model: string;
 
-  @DeleteDateColumn()
-    deletedDate: Date;
+  @Column()
+    make: string;
+
+  @Column(() => Date)
+    date: Date;
+
+  @OneToMany(() => Listing, (listing) => listing.car)
+    listing: Listing[];
 }

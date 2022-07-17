@@ -1,5 +1,6 @@
 import { Body, Get, Put, Delete, JsonController, Post, UseBefore, QueryParams } from "routing-controllers";
 import { VINDecoderMiddleware } from "../../middlewares";
+import { Car, Listing } from "../../models";
 
 @JsonController("/car")
 export class CarController {
@@ -10,13 +11,33 @@ export class CarController {
 
   @Post("/create-listing")
   @UseBefore(VINDecoderMiddleware)
-  async create(@Body() body: any, @QueryParams() query: any): Promise<string> {
+  async create(@Body() body: Omit<Listing, "id" | "date" | "car">, @QueryParams() query: Omit<Car, "id" | "date" | "listing">): Promise<string> {
+    const { vin, make, model, year } = query;
+    const car = new Car();
+    car.vin = vin;
+    car.make = make;
+    car.model = model;
+    car.year = +year;
+    await car.save();
+
+    const { licenseNumber, registrationName, registrationState, registrationExpirationDate, carValue, currentMileage } = body;
+    const listing = new Listing();
+    listing.licenseNumber = licenseNumber;
+    listing.registrationName = registrationName;
+    listing.registrationState = registrationState;
+    listing.registrationExpirationDate = registrationExpirationDate;
+    listing.carValue = carValue;
+    listing.currentMileage = currentMileage;
+    listing.car = car;
+    await listing.save();
+
     return "Posted new listing to database.";
   }
 
   @Put("/update-listing")
   @UseBefore(VINDecoderMiddleware)
-  async update(@Body() body: any, @QueryParams() query: any): Promise<string> {
+  async update(@Body() body: Omit<Listing, "id" | "date" | "car">, @QueryParams() query: Omit<Car, "id" | "date" | "listing">): Promise<string> {
+    const listing = new Listing();
     return "Updated listing to database.";
   }
 

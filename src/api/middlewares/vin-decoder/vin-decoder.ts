@@ -34,7 +34,7 @@ export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
 
       const { Make, ModelYear, Model } = Results[0];
 
-      request.query = { vin, make: Make, modelYear: ModelYear, model: Model };
+      request.query = { vin, make: Make, year: ModelYear, model: Model };
 
       next();
     } catch (error) {

@@ -1,13 +1,5 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  OneToMany,
-} from "typeorm";
-
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
 import { Listing } from "../listing-entity/listing-entity";
-import { Date } from "../date-entity/date-entity";
 
 @Entity("Car")
 export class Car extends BaseEntity {
@@ -26,8 +18,14 @@ export class Car extends BaseEntity {
   @Column()
     make: string;
 
-  @Column(() => Date)
-    date: Date;
+  @CreateDateColumn()
+    createdDate: Date;
+
+  @UpdateDateColumn()
+    updatedDate: Date;
+
+  @DeleteDateColumn()
+    deletedDate: Date;
 
   @OneToMany(() => Listing, (listing) => listing.car)
     listing: Listing[];

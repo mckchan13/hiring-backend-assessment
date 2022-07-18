@@ -1,6 +1,6 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
 import { Car } from "../car-entity/car-entity";
-import { Date } from "../date-entity/date-entity";
+import { Registration } from "../registration-entity/registration-entity";
 
 @Entity("Listing")
 export class Listing extends BaseEntity {
@@ -10,17 +10,8 @@ export class Listing extends BaseEntity {
   @Column()
     licenseNumber: number;
 
-  @Column()
-    registrationNumber: number;
-
-  @Column()
-    registrationState: string;
-
-  @Column()
-    registrationName: string;
-
-  @Column()
-    registrationExpirationDate: Date;
+  @Column(() => Registration)
+    registration: Registration;
 
   @Column()
     carValue: number;
@@ -28,8 +19,14 @@ export class Listing extends BaseEntity {
   @Column()
     currentMileage: number;
 
-  @Column(() => Date)
-    date: Date;
+  @CreateDateColumn()
+    createdDate: Date;
+
+  @UpdateDateColumn()
+    updatedDate: Date;
+
+  @DeleteDateColumn()
+    deletedDate: Date;
 
   @ManyToOne(() => Car, (car) => car.listing)
     car: Car;

@@ -3,18 +3,22 @@ import axios, { AxiosResponse } from "axios";
 import { Request } from "express";
 import { Car, Listing } from "../../models";
 
-
 export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
-
-  async use(request: Request<Omit<Listing & Car, "id" | "date" | "listing" | "car">>, response: unknown, next?: (err?: unknown) => void | never): Promise<void> {
+  async use(
+    request: Request<Omit<Listing & Car, "id" | "date" | "listing" | "car">>,
+    response: unknown,
+    next?: (err?: unknown) => void | never,
+  ): Promise<void> {
     try {
-      const { body, query: { vin } } = request;
+      const { body } = request;
+      const { vin } = body;
 
-      if (!vin || typeof vin !== "string") return next({
-        log: `Error in ${this.use}: User did not provide VIN number or VIN format is incorrect.`,
-        status: 400,
-        message: { error: "Error: Incorrect VIN provided. Please provide a valid VIN number" },
-      });
+      if (!vin || typeof vin !== "string")
+        return next({
+          log: `Error in ${this.use}: User did not provide VIN number or VIN format is incorrect.`,
+          status: 400,
+          message: { error: "Error: Incorrect VIN provided. Please provide a valid VIN number" },
+        });
 
       const URL = process.env.VIN_DECODE_URL + `${vin}?format=json`;
 
@@ -33,12 +37,21 @@ export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
       const { Results } = data;
       const { Make, ModelYear, Model } = Results[0];
 
-      request.body = {...body, make: Make, year: +ModelYear, model: Model};
+      request.body = {
+        ...body,
+        carValue: +body.carValue,
+        currentMileage: +body.currentMileage,
+        make: Make,
+        year: +ModelYear,
+        model: Model,
+        registrationExpirationDate: new Date(body.registrationExpirationDate),
+        registrationNumber: +body.registrationNumber,
+      };
 
       next();
     } catch (error) {
       return next({
-        error
+        error,
       });
     }
   }

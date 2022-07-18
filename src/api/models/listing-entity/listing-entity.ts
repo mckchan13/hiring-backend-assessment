@@ -1,6 +1,5 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
 import { Car } from "../car-entity/car-entity";
-import { Registration } from "../registration-entity/registration-entity";
 
 @Entity("Listing")
 export class Listing extends BaseEntity {
@@ -8,10 +7,19 @@ export class Listing extends BaseEntity {
     id: string;
 
   @Column()
-    licenseNumber: number;
+    licenseNumber: string;
 
-  @Column(() => Registration)
-    registration: Registration;
+  @Column()
+    registrationNumber: number;
+
+  @Column()
+    registrationState: string;
+
+  @Column()
+    registrationName: string;
+
+  @Column()
+    registrationExpirationDate: Date;
 
   @Column()
     carValue: number;

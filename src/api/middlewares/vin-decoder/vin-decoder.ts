@@ -1,23 +1,28 @@
 import { ExpressMiddlewareInterface } from "routing-controllers";
 import axios, { AxiosResponse } from "axios";
 import { Request } from "express";
+import { Car, Listing } from "../../models";
 
-// @Middleware({type: "before"})
 export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
-
-  async use(request: Request<CarListInput>, response: any, next?: (err?: any) => any): Promise<void> {
+  async use(
+    request: Request<Omit<Listing & Car, "id" | "date" | "listing" | "car">>,
+    response: unknown,
+    next?: (err?: unknown) => void | never,
+  ): Promise<void> {
     try {
-      const { query: { vin } } = request;
+      const { body } = request;
+      const { vin } = body;
 
-      if (!vin || typeof vin !== "string") return next({
-        log: `Error in ${this.use}: User did not provide VIN number or VIN format is incorrect.`,
-        status: 400,
-        message: { error: "Error: Incorrect VIN provided. Please provide a valid VIN number" },
-      });
+      if (!vin || typeof vin !== "string")
+        return next({
+          log: `Error in ${this.use}: User did not provide VIN number or VIN format is incorrect.`,
+          status: 400,
+          message: { error: "Error: Incorrect VIN provided. Please provide a valid VIN number" },
+        });
 
       const URL = process.env.VIN_DECODE_URL + `${vin}?format=json`;
 
-      const decodedVINData: AxiosResponse<IDecodedVINData, unknown> = await axios.get(URL);
+      const decodedVINData: AxiosResponse = await axios.get(URL);
 
       const { data, status, statusText } = decodedVINData;
 
@@ -30,38 +35,24 @@ export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
       }
 
       const { Results } = data;
-
       const { Make, ModelYear, Model } = Results[0];
 
-      request.query = { vin, make: Make, modelYear: ModelYear, model: Model };
+      request.body = {
+        ...body,
+        carValue: +body.carValue,
+        currentMileage: +body.currentMileage,
+        make: Make,
+        year: +ModelYear,
+        model: Model,
+        registrationExpirationDate: new Date(body.registrationExpirationDate),
+        registrationNumber: +body.registrationNumber,
+      };
 
       next();
     } catch (error) {
       return next({
-        error
+        error,
       });
     }
   }
-}
-
-interface IDecodedVINData {
-  Results: DecodedVINData[]
-}
-
-interface CarListInput extends DecodedVINData {
-  licensePlateNumber: number;
-  registrationNumber: number;
-  registrationState: string;
-  registrationExpiration: Date;
-  registrationName: string;
-  vin: string;
-  carValue: number;
-  currentMileage: number;
-  vehicleDescription: string;
-}
-
-interface DecodedVINData {
-  Model: string;
-  ModelYear: string;
-  Make: string;
 }

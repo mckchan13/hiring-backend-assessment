@@ -6,7 +6,7 @@ export class Car extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
     id: string;
 
-  @Column()
+  @Column({unique: true})
     vin: string;
 
   @Column()

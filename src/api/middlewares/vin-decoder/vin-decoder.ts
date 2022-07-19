@@ -48,7 +48,7 @@ export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
         registrationNumber: +body.registrationNumber,
       };
 
-      next();
+      return next();
     } catch (error) {
       return next({
         error,

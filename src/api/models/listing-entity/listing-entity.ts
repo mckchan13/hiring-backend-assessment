@@ -27,6 +27,9 @@ export class Listing extends BaseEntity {
   @Column()
     currentMileage: number;
 
+  @Column()
+    vehicleDescription: string;
+
   @CreateDateColumn()
     createdDate: Date;
 

@@ -1,112 +1,48 @@
-# carSHAiR Backend Assessment
+# Backend Assessment
 
-![carSHAiR Logo](https://www.carshair.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FCarSHAiR-Logo.bfa0a90d.png&w=3840&q=75)
+## Assumptions
 
-## Description
+### Client Request Assumptions
+- I assumed the client would send send data, via POST request body, in the following JSON format:
+    ```json
+    {
+        "vin": "5YJXCBE20GF005643",
+        "licenseNumber" : "5KBW943",
+        "registrationNumber": "12345",
+        "registrationState": "CA",
+        "registrationName": "Lebron James",
+        "registrationExpirationDate": "2023-7-20",
+        "carValue": "125000",
+        "currentMileage": "5000",
+        "vehicleDescription": "A cool car!"
+    }
+    ```
+- I also assumed that subsequent queries for the listing data would be available via the listing id. In my database schema and API structure, when a new car and listing are created, the listing id is returned to the client. The client is then able to query for, update or delete the listing based on the newly created listing id.
 
-### Background
+### API Structure
+- A single Car controller was created for the singular Car resource.
+- The entire controller is wrapped in @JsonController.
+- JSON is ubiquitious and the "de facto" data exchange format on the web.
+- The entire Car controller also utilizes json parser middleware to parse the body from the request. This makes it easy to manipulate and access the exposed variables in the request body.
+- The VIN decoding logic was placed into a custom middleware. This was done to modularize the code, provide some level of abstraction, and make the middleware available for reuse in other controllers or routes.
+- Full range CRUD operation routes were added. The client is able to query for car listings, create new listings, update and delete listings.
+- Named routes based on the nouns for the resource. Let the HTTP methods communicate the operation needed to enact on the resource.
 
-carSHAiR is a peer to peer car sharing platform with a mission to bring high tech solutions to provide an exceptional experience for Guests and Hosts within the car sharing space.
 
-Often times, product requirements are manifested as a series of UI sketches. These sketches provide context as to the user experience our product team envisions for users of the platform.
+### Database Structure
+- For the database structure I decided to create 2 entities - Car and Listing.
+- I considered the fact that each car is unique, but may have multiple listings. Hence, in the entities I created a One-to-Many and Many-to-One relationship between Car and Listing entities.
+- When creating a new listing, the server will check for an existing car with the provided VIN number.  If one already exists, it will proceed to create a new listing. If it does not exist, a new Car entity is created, followed by the new listing.
+- I separated the Car and Listing entities to reduce database duplication, especially as the database scales. A new listing does not need to keep saving the same Car data - new listings for the same car can reference an existing car in the database since the car properties are "immutable."
+- The Car entity is composed of "immutable" and unique properties of the car - the VIN, the make, model and year - these never change about the car (excluding the assumption that the car is heavily modified at some future point in time.)
+- The Listing entity is composed of "mutable" properties - in theory the registration data can change.  For example, if ownership changes hands, the car gains more mileage and the car value depreciates over time.
+- Vehicle description was also added to Listing entity since new listings may change the vehicle description at the choosing of the lister.
+- An eager relation was added to the Listing entity so that when a listing is queried for, it returns the associated car data as well.
 
-In order for a car to be "rentable", a car must first be "listed" on the platform. A common user workflow for our Hosts (owners of cars) is to list a new car on the platform. This workflow takes Hosts through a multi-step process in which details about the car are collected, building towards a final listing of their car.
 
-One simplified step in this multi-step process of listing a car is to collect essential details about the Host's car.
+## Getting Started
 
-### Objectives
-
-As a Backend Developer, you are given a UI sketch from the product team of a single step within the "List a car" workflow. It is your objective to design and build a set of REST API's to support the functionality expressed within the provided UI sketch.
-
-[List a car UI sketch](https://xd.adobe.com/view/fed5ede8-2626-46ec-a3f9-ec0cba0df6f4-ab86/)
-
-#### Scope Clarifications:
-
-- The scope of your responsibilities are limited to the isolated feature of collecting and storing the information presented on the UI sketch. Although it is implied the car is "owned" by a Host account, design and implementation of accounts is outside the scope of your responsibilities. Assume cars are not owned by users.
-- Frontend design/implementation is not required.
-- Although the requirements can be achieved using a single database table with all the business logic written inside your controller methods, ensure your solution applies "best practices" in your database/api design as well as the project structure. Make sure your solution is "scalable" to a larger project.
-
-#### Constraints
-
-- Your REST API must save the collected data to a database
-- Your REST API must support CRUD functionality to **one** resource (e.g. CRUD endpoints for a **car** resource)
-- Along with saving the VIN itself, your API must also decode the VIN and save the decoded vehicle details
-  - Note: only basic vehicle details such as year, make, model are required to be saved.
-
-### Resources
-
-- [List a car UI sketch](https://xd.adobe.com/view/fed5ede8-2626-46ec-a3f9-ec0cba0df6f4-ab86/)
-
-- Setting up a project from scratch is a rare occurrence in most developer's the day-to-day responsibilities. The design of this assessment is not to test your ability on how to setup a project, but rather your ability to contribute to an established project.
-
-  Choice of language, framework, database, etc is flexible but bonus points if you are already comfortable with our current stack:
-  - MySQL
-  - TypeORM
-  - TypeScript
-  - Node.js
-  - Express
-  - routing-controllers
-
-  If you do so choose to implement using our stack, feel free to fork this template repository to help you get started.
-
-- [TypeORM documentation](https://github.com/typeorm/typeorm)
-
-- [routing-controllers documentation](https://github.com/typestack/routing-controllers)
-
-- [Random VIN generator](https://vingenerator.org/)
-
-- [National Highway Traffic Safety Administration (NHTSA) API](https://vpic.nhtsa.dot.gov/api/) for decoding a VIN
-
-### Submission Requirements
-
-- Send us a link to your submission inside a git repository
-  - Show us you are comfortable working with git by keeping a detailed git history
-
-- If forking this repository, delete this README and replace with your own
-
-- Provide a README with your submission summarizing:
-  - Assumptions made
-  - Step by step details on how to bring up the server
-
-- Please omit the company name from your repository/project name
-
-- (Optional) We are always trying to improve the assessment experience for future candidates. When sending your submission, please provide some feedback on the assessment description including details such as:
-
-  - How long the assessment took to complete
-  - Whether or not the requirements were clear
-  - On a scale of 1 - 10, the level of difficulty
-  - If given the choice, would they rather have done an Leet-code style assessment over a project-based assessment
-
-  Feedback on the assessment description will not affect our evaluation of your submission.
-
-## Template Project Setup
-
-### Overview
-
-To reiterate - **there are no restrictions on the choice of tech stack used for your submission.** The main purpose of this assessment is to assess your ability to contribute to an established project.
-
-If you do choose to implement using our stack, feel free to fork this template repository to help you get started. Feel free to add or remove dependencies as necessary.
-
-This template project is composed of the following stack:
-
-- MySQL (through Docker)
-- TypeORM
-- TypeScript
-- Node.js
-- Express
-- routing-controllers
-
-### Prerequisites
-
-- Docker
-  - [General install](https://docs.docker.com/get-docker/)
-  - [homebrew](https://formulae.brew.sh/cask/docker)
-
-- yarn
-  - [General install](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable)
-  - [homebrew](https://formulae.brew.sh/formula/yarn)
-
-### Getting Started
+Since I used the same tech stack, the instructions to bring up the server are the same.
 
 To bring up the environment, perform the following steps:
 
@@ -121,7 +57,9 @@ To bring up the environment, perform the following steps:
 2. Bring up express server in development mode
 
     ```bash
-    # In a separate terminal session
-    yarn dev
+    # In a separate terminal session, install necessary packages
+    yarn install
+
     # Exposes express app on port 8889
+    yarn dev
     ```

@@ -1,5 +1,6 @@
+import path from "path";
 import { Connection, createConnection } from "typeorm";
-import { Car, Listing,  } from "../api/models";
+// import { Car, Listing } from "../api/models";
 
 export async function DatabaseConnectionLoader(): Promise<Connection> {
   const connection: Connection = await createConnection({
@@ -9,7 +10,7 @@ export async function DatabaseConnectionLoader(): Promise<Connection> {
     username: process.env.TYPEORM_USERNAME,
     password: process.env.TYPEORM_PASSWORD,
     database: process.env.TYPEORM_DATABASE,
-    entities: [Car, Listing],
+    entities: [path.resolve(__dirname, "../api/models/**/*.ts")],
     synchronize: true,
   });
   console.log("[database] connected", connection.name);

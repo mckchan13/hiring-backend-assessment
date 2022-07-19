@@ -63,3 +63,9 @@ To bring up the environment, perform the following steps:
     # Exposes express app on port 8889
     yarn dev
     ```
+
+## Feedback
+- The assessment took me about 3 days to complete.
+- The requirements were overall clear. However despite that it was explicitly said that any tech stack could be used, the follow up statement "The main purpose of this assessment is to assess your ability to contribute to an established project" felt at odds with the fact that we could use any tech stack. Hence I felt compelled to use the specified tech stack.
+- I would rate difficulty of the assessment a 6/10, it was not super difficult due to the "batteries included" nature of already having an Express server and docker compose file with MySQL pre-setup. For me, I think a lot of the difficulty came from being unfamiliar with routing-controllers, TypeORM and MySQL. I am very comfortable with Express but never used the routing-controllers framework. Likewise I have used other ORMs like Prisma but never used TypeORM. I have also used PostgreSQL but not MySQL. So it took me time to read through documentation and to understand the APIs of each technology/framework.
+- Despite this I enjoyed the process of learning some new frameworks.  I think ultimately this style of assessment is preferable to Leet code style interviews. However due to the lengthy time consumption of doing a take home assessment, there were moments when I felt like it would be better to be tested on algorithms.

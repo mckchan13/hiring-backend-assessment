@@ -36,6 +36,6 @@ export class Listing extends BaseEntity {
   @DeleteDateColumn()
     deletedDate: Date;
 
-  @ManyToOne(() => Car, (car) => car.listing)
+  @ManyToOne(() => Car, (car) => car.listing, { eager: true })
     car: Car;
 }

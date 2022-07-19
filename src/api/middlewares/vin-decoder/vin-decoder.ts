@@ -2,10 +2,11 @@ import { ExpressMiddlewareInterface } from "routing-controllers";
 import axios, { AxiosResponse } from "axios";
 import { Request } from "express";
 import { Car, Listing } from "../../models";
+import { entityPropertyOmissions } from "../../controllers/";
 
 export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
   async use(
-    request: Request<Omit<Listing & Car, "id" | "date" | "listing" | "car">>,
+    request: Request<Omit<Listing & Car, entityPropertyOmissions>>,
     response: unknown,
     next?: (err?: unknown) => void | never,
   ): Promise<void> {
@@ -15,7 +16,7 @@ export class VINDecoderMiddleware implements ExpressMiddlewareInterface {
 
       if (!vin || typeof vin !== "string")
         return next({
-          log: `Error in ${this.use}: User did not provide VIN number or VIN format is incorrect.`,
+          log: `Error in ${this.constructor.name}: User did not provide VIN number or VIN format is incorrect.`,
           status: 400,
           message: { error: "Error: Incorrect VIN provided. Please provide a valid VIN number" },
         });
